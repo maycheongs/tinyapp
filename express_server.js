@@ -37,6 +37,16 @@ const urlDatabase = {                       //an object (i.e. object/array)
 //   res.render('pages/about');
 // });
 
+app.post('/urls', (req, res) => {
+  let site = req.body.longURL;
+  for (let short in urlDatabase) {
+    if (site === urlDatabase[short]) {
+      console.log('Exists!');
+      return;
+    }
+  }   
+  urlDatabase[generateRandomString(6)] = req.body.longURL;  
+})
 
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase}
@@ -56,9 +66,7 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 })
 
-app.post('/urls', (req, res) => {
-  urlDatabase[generateRandomString(6)] = req.body.longURL;  
-})
+
 
 
 app.listen(PORT, () => {
