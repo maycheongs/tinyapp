@@ -1,5 +1,6 @@
+const PORT = 8080;
 
-//starter code
+//starter libs and settings
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -22,7 +23,6 @@ const generateRandomString = num => {
 }
 
 //And we begin!
-const PORT = 8080;
 const urlDatabase = {
   "b2xVn2" : "http://lighthouselabs.ca",
   "9sm5xk" : "http://google.com"
@@ -57,10 +57,14 @@ app.get('/urls/new', (req, res) => {
   res.render('urls_new');
 });
 
+app.post('/urls/:id/delete', (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls/")
+})
+
 // :ID generates a object key 'ID' on the inbuilt req.params object with the value as per request.
 app.get('/urls/:shortURL', (req, res) => {
-  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
-  console.log(req.params)
+  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};  
   res.render('urls_show', templateVars);
 })
 
