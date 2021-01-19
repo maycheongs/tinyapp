@@ -37,21 +37,25 @@ const urlDatabase = {                       //an object (i.e. object/array)
 //   res.render('pages/about');
 // });
 
-app.post('/urls', (req, res) => {
-  let site = req.body.longURL;
-  for (let short in urlDatabase) {
-    if (site === urlDatabase[short]) {
-      console.log('Exists!');
-      return;
-    }
-  }   
-  urlDatabase[generateRandomString(6)] = req.body.longURL;  
-})
 
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase}
   res.render('urls_index', templateVars);              //.json does JSON.stringify on an object automatically
 });
+
+app.post('/urls', (req, res) => {
+  let site = req.body.longURL;
+  for (let short in urlDatabase) {
+    if (site === urlDatabase[short]) {
+      console.log('Exists!');
+      res.redirect(`/urls/${short}`)
+      return;
+    }
+  }
+  const newId = generateRandomString(6);
+  urlDatabase[newId] = req.body.longURL;
+  res.redirect(`/urls/${newId}`);
+})
 
 app.get('/hello', (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n")
@@ -63,7 +67,13 @@ app.get('/urls/new', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
+  console.log(req.params)
   res.render('urls_show', templateVars);
+})
+
+app.get('/u/:shortURL', (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];  
+  res.redirect(longURL);
 })
 
 
