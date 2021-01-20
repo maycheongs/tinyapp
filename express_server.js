@@ -82,16 +82,22 @@ app.get('/urls', (req, res) => {
 
 //ADDING A NEW URL ENTRY
 app.get('/urls/new', (req, res) => {
+
+  if (!req.cookies['user_id']) {
+    res.redirect('/login');
+    return;
+  } else {
   const templateVars = {
     users,
     user: req.cookies['user_id']
   };
   res.render('urls_new', templateVars);
+  }
 });
 
 app.post('/urls', (req, res) => {
   let site = req.body.longURL;
-  if (site.substring(0,6) !== 'http://') {
+  if (site.substring(0,7) !== 'http://') {
     site = 'http://' + site;
   }
   for (let short in urlDatabase) {
@@ -124,7 +130,11 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 })
 
 app.post('/urls/:shortURL/edit', (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.newLongURL;
+  let longURL = req.body.newLongURL;
+  if (longURL.substring(0,7) !== "http://") {
+    longURL = 'http://' + longURL;
+  }
+  urlDatabase[req.params.shortURL] = longURL;
   
   res.redirect('/urls/');
 })
