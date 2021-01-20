@@ -4,9 +4,11 @@ const PORT = 8080;
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 //helper function
 const generateRandomString = num => {
@@ -29,7 +31,10 @@ const urlDatabase = {
 };
 
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase}
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies['username']
+  }
   res.render('urls_index', templateVars);
 });
 
@@ -37,6 +42,9 @@ app.get('/urls', (req, res) => {
 //if long url entered exists, redirect to existing /urls/shortURL, else create and redirect.
 app.post('/urls', (req, res) => {
   let site = req.body.longURL;
+  if (site.substring(0,6) !== 'http://') {
+    site = 'http://' + site;
+  }
   for (let short in urlDatabase) {
     if (site === urlDatabase[short]) {
       console.log('Exists!');
@@ -45,7 +53,7 @@ app.post('/urls', (req, res) => {
     }
   }
   const newId = generateRandomString(6);
-  urlDatabase[newId] = req.body.longURL;
+  urlDatabase[newId] = site;
   res.redirect(`/urls/${newId}`);
 })
 
@@ -54,17 +62,40 @@ app.post('/urls', (req, res) => {
 // })
 
 app.get('/urls/new', (req, res) => {
-  res.render('urls_new');
+  const templateVars = {username: req.cookies['username']}
+  res.render('urls_new', templateVars);
 });
 
-app.post('/urls/:id/delete', (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect("/urls/")
+app.post('/urls/:shortURL/delete', (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect('/urls/');
+})
+
+app.post('/urls/:shortURL/edit', (req, res) => {
+  urlDatabase[req.params.shortURL] = req.body.newLongURL;
+
+  res.redirect('/urls/');
+})
+
+//LOGIN
+app.post("/login", (req, res) => {
+  let user = req.body.username;  
+  res.cookie('username',user);
+  res.redirect('/urls')
+})
+
+app.get('/logout', (req,res) => {
+  res.clearCookie('username');
+  res.redirect('/urls')
 })
 
 // :ID generates a object key 'ID' on the inbuilt req.params object with the value as per request.
 app.get('/urls/:shortURL', (req, res) => {
-  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};  
+  const templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL],
+    username: req.cookies['username']
+  };  
   res.render('urls_show', templateVars);
 })
 
@@ -73,6 +104,9 @@ app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];  
   res.redirect(longURL);
 })
+
+
+
 
 
 
