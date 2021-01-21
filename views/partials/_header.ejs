@@ -7,11 +7,11 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>        
+        <a class="nav-item nav-link" href="/urls/new">Create New</a>        
       </div>
       <div class="navbar-nav ml-auto">
         <% if (user) {%>
-          <span class="navbar-item pt-2">Logged In As: <b><%=users[user].name%></b>
+          <span class="navbar-item pt-2">Logged In As: <b><%=user.name%></b>
             </span><form class="form-inline" method="POST" action="/logout">                     
             <button type="submit" class="btn btn-sm btn-dark nav-link ml-2">Logout</button>
           </form>
