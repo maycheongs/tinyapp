@@ -55,7 +55,7 @@ const users = {
 
 //ROUTES
 
-// /HOMEPAGE and URLS
+// /HOMEPAGE and MAIN
 app.get('/', (req, res) => {
   if (req.userId) {
     res.redirect('/urls');
@@ -66,7 +66,6 @@ app.get('/', (req, res) => {
 
 app.get('/urls', (req, res) => {
 
-  console.log(req.userId)
   const templateVars = {
     urls: urlsForUser(urlDatabase,req.userId),
     user: users[req.userId] //user object
@@ -94,18 +93,18 @@ app.post('/urls', (req, res) => {
     site = 'http://' + site;
   }
   let urls = urlsForUser(urlDatabase,req.userId);
-  for (let short in urls) {
-    if (site === urls[short]) {
+  for (let shortURL in urls) {
+    if (site === urls[shortURL]) {
       console.log('Exists!');
-      res.redirect(`/urls/${short}`)               //if url already exists in the user's list, show existing shorturl
+      res.redirect(`/urls/${shortURL}`)               //if url already exists in the user's list, show existing shorturl
       return;
     }
   }
-  const newId = generateRandomString(6);
-  urlDatabase[newId] = {
+  const newShortURL = generateRandomString(6);
+  urlDatabase[newShortURL] = {
     longURL: site, userID: req.userId
   }
-  res.redirect(`/urls/${newId}`);
+  res.redirect(`/urls/${newShortURL}`);
 })
 
 
@@ -125,28 +124,34 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-app.post('/urls/:shortURL/delete', (req, res) => {
-  let shortURL = req.params.shortURL
-  if (urlDatabase[shortURL].userID === req.userId) {
-  delete urlDatabase[req.params.shortURL];
-  };
-  res.redirect('/urls/');
-})
 
-app.post('/urls/:shortURL/update', (req, res) => {
+app.post('/urls/:shortURL', (req, res) => {
   let longURL = req.body.newLongURL;
   if (longURL.substring(0,7) !== "http://") {
     longURL = 'http://' + longURL;
   }
   let shortURL = req.params.shortURL;
-  if (urlDatabase[shortURL].userID === req.userId) {
-  urlDatabase[shortURL].longURL = longURL;
-  }  
-  res.redirect('/urls/');
+  let status = 302;
+  if (urlDatabase[shortURL].userID === req.userId) {      //if entry belongs to logged-in user
+    urlDatabase[shortURL].longURL = longURL;
+  } else {
+    status = 401;
+  }
+  res.redirect(status,'/urls/');
 })
 
+app.post('/urls/:shortURL/delete', (req, res) => {
+  let shortURL = req.params.shortURL
+  let status = 302;
+  if (urlDatabase[shortURL].userID === req.userId) {
+  delete urlDatabase[req.params.shortURL];
+  } else {
+    status = 401;
+  }
+  res.redirect(status,'/urls/');
+})
 
-//GOING TO THE LONG URL
+// GOING TO THE LONG URL
 app.get('/u/:shortURL', (req, res) => {
   let shortURL = req.params.shortURL
   if (!urlDatabase[shortURL]) {
@@ -175,7 +180,7 @@ app.post('/register', (req, res) => {
     return;
   }
   if (email === '' || password === '') {
-    res.send(`Error 400: Bad Request - Field entries cannot be empty.\n Go back to <a href="/register">Sign Up</a>?`);
+    res.send(`Error 400: Bad Request - Email/Password cannot be empty.\n Go back to <a href="/register">Sign Up</a>?`);
     return;
   }
   let newID = generateRandomString(4);
@@ -185,7 +190,7 @@ app.post('/register', (req, res) => {
     email,
     password: bcrypt.hashSync(password, saltRounds)
   };
-  console.log(users);
+  //console.log(users);
   req.session['user_id'] = newID
   res.redirect('/urls');
 });
@@ -218,7 +223,7 @@ app.post("/login", (req, res) => {
 })
 
 app.post('/logout', (req,res) => {
-  req.session['user_id'] = null;
+  req.session = null;
   res.redirect('/urls')
 })
 
