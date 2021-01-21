@@ -6,6 +6,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan')
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -47,9 +49,7 @@ const isPassword = (usersObj, email, password) => {
   for (let userID in usersObj) {
     if (usersObj[userID].email === email) {
       let user = usersObj[userID];
-      if (user.password === password) {
-        return true;
-      }
+      return bcrypt.compareSync(password, user.password);      
     }
   }
   return false;
@@ -76,7 +76,7 @@ const users = {
     id: "testID",
     name: "testname",
     email: "test@test.com",
-    password: "password"
+    password: "$2b$10$N3/DPHOw2f8OuAOZqC6PiuJNlEy1pq4L//r/E8YyDHkrAMnZ1zeHO" //'password'
   }
 }
 
@@ -195,7 +195,7 @@ app.post('/register', (req, res) => {
     id: newID,
     name,
     email,
-    password
+    password: bcrypt.hashSync(password, saltRounds)
   };
   console.log(users);
   res.cookie('user_id', newID)
