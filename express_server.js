@@ -113,8 +113,9 @@ app.post('/urls', (req, res) => {
   if (site.substring(0,7) !== 'http://') {
     site = 'http://' + site;
   }
-  for (let short in urlDatabase) {
-    if (site === urlDatabase[short].longURL) {
+  let urls = urlsForUser(req.cookies['user_id']);
+  for (let short in urls) {
+    if (site === urls[short]) {
       console.log('Exists!');
       res.redirect(`/urls/${short}`)
       return;
