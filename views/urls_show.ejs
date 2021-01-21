@@ -16,13 +16,17 @@
         <div class="card-footer text-muted"></div>
         <div class="card-header"></div>
         <div class="card-body">
+          <%if (urls[shortURL].userID !== user) { %>
+            <div> Cannot edit.You are not logged in or entry is not saved under this account. <a href="/login">Log in here.</a></div>
+          <% } else {%>
         <h4 class="card-title">Edit</h4> 
         <p><form method="POST", action="/urls/<%=shortURL%>/edit">
         <label for="newlongURL">Enter new URL:</label>
         <input type="text" name="newLongURL" placeholder="http://" style="width: 300px; margin: 1em">      
-        <button type="submit">Submit</button>
-        </form></p> 
-      </div>
+        <button type="submit" class="btn btn-dark">Submit</button>
+        </form></p>
+        <% } %>
+        </div>
     <div class="card-footer text-muted"></div>
   </div>
   <!-- Bootstrap JS -->
