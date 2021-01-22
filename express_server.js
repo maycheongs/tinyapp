@@ -117,11 +117,16 @@ app.get('/urls/:shortURL', (req, res) => {
     res.send(`Error 404: Not Found. Go back to <a href="/urls">home</a>.`)   //if doesn't exist display error + home link
     return;
   }
+  const ownerId = urlDatabase[shortURL].userID;
+
+  if (req.userId !== ownerId) {
+    res.send(`Error 401: Not Authorised. If you are the owner, please <a href='/login'>log in</a> to view this page.`);
+    return;
+  }
   const templateVars = {
     shortURL: shortURL,
     longURL: urlDatabase[shortURL].longURL,
-    user: users[req.userId],
-    ownerId: urlDatabase[shortURL].userID,
+    user: users[req.userId]    
   };  
   res.render('urls_show', templateVars);
 });
