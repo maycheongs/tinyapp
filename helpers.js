@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-const generateRandomString = num => {
+const generateRandomString = num => {       //Generates a random alpha-numeric string. param = length of string.
   let string = '';
   while (num > 0) {
     let char = Math.random().toString(36)[2];
@@ -14,7 +14,7 @@ const generateRandomString = num => {
   return string;
 };
 
-const emailExists = (users, email) => {
+const emailExists = (users, email) => {     //Checks if email(string) exists in the users database. True/False
   for (let userID in users) {
     if (users[userID].email === email) {
       return true;
@@ -23,7 +23,7 @@ const emailExists = (users, email) => {
   return false;
 };
 
-const getIdByEmail = (users, email) => {
+const getIdByEmail = (users, email) => {    //returns userID in the users database according to the email.
   for (let userID in users) {
     if (users[userID].email === email) {
       return userID;
@@ -31,17 +31,17 @@ const getIdByEmail = (users, email) => {
   }
 }
 
-const isPassword = (users, email, password) => {
+const isPassword = (users, email, password) => {    //Password authentication according to email. returns true/false.
   for (let userID in users) {
     let user = users[userID];
     if (user.email === email) {      
-      return bcrypt.compareSync(password, user.password);      
+      return bcrypt.compareSync(password, user.password);
     }
   }
   return false;
 }
 
-const urlsForUser = (urlDatabase,id) => {
+const urlsForUser = (urlDatabase,id) => {          //returns an obj with shortURL: longURL that the user owns.
   let userUrls = {}
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
