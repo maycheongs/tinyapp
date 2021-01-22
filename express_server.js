@@ -42,8 +42,18 @@ app.use(timeNow);
 
 // DATABASES
 const urlDatabase = {
-  "b2xVn2" : {longURL: "http://lighthouselabs.ca", userID: "testID"},
-  "9sm5xk" : {longURL: "http://google.com", userID: "testID"}
+  "b2xVn2" : {
+    longURL: "http://lighthouselabs.ca",
+    userID: "testID",
+    totalViews: 0,
+    uniqueViews: 0
+  },
+  "9sm5xk" : {
+    longURL: "http://google.com",
+    userID: "testID",
+    totalViews: 0,
+    uniqueViews: 0
+  }
 };
 
 const users = {
@@ -103,7 +113,7 @@ app.post('/urls', (req, res) => {
   }
   const newShortURL = generateRandomString(6);
   urlDatabase[newShortURL] = {
-    longURL: site, userID: req.userId
+    longURL: site, userID: req.userId, totalViews: 0, uniqueViews: 0
   }
   res.redirect(`/urls/${newShortURL}`);
 })
@@ -124,7 +134,9 @@ app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {
     shortURL: shortURL,
     longURL: urlDatabase[shortURL].longURL,
-    user: users[req.userId]    
+    user: users[req.userId],
+    totalViews: urlDatabase[shortURL].totalViews,
+    uniqueViews: urlDatabase[shortURL].uniqueViews   
   };  
   res.render('urls_show', templateVars);
 });
@@ -158,15 +170,29 @@ app.delete('/urls/:shortURL', (req, res) => {
 
 // GOING TO THE LONG URL
 app.get('/u/:shortURL', (req, res) => {
-  let shortURL = req.params.shortURL
-  if (!urlDatabase[shortURL]) {
+  const shortURL = urlDatabase[req.params.shortURL];   
+  if (!shortURL) {
     res.send(`Error 404: Not found - the short URL does not exist`)
   } else {
-  const longURL = urlDatabase[req.params.shortURL].longURL;  
+  const longURL = shortURL.longURL;
+  //add a cookie for each visit to the link  
+  if (!req.session.pageViews) {
+    req.session.pageViews = 1;
+    const visitorID = generateRandomString(4);
+    req.session.visitorID = visitorID;
+  } else {
+    req.session.pageViews++
+  }
+  console.log(req.session.pageViews)
+  //update database
+  shortURL.totalViews++;                    //increments totalViews for the shorturl
+  if (req.session.pageViews == 1) {
+    shortURL.uniqueViews++;
+    console.log(shortURL.uniqueViews)       //if cookie pageViews = 1 (i.e. first visit), increment uniqueViews 
+  }  
   res.redirect(longURL);
   }
 });
-
 
 // REGISTRATION
 app.get('/register', (req, res) => {
