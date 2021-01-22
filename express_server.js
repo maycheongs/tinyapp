@@ -5,7 +5,8 @@ const app = express();
 // MIDDLEWARE & HELPERS
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
-const morgan = require('morgan')
+const methodOverride = require('method-override');
+const morgan = require('morgan');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const userId = (req, res, next) => {
@@ -26,6 +27,7 @@ const {
 
 
 app.set('view engine', 'ejs');
+app.use(methodOverride('_method'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(
   cookieSession({
@@ -125,7 +127,7 @@ app.get('/urls/:shortURL', (req, res) => {
 });
 
 
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   let longURL = req.body.newLongURL;
   if (longURL.substring(0,7) !== "http://") {
     longURL = 'http://' + longURL;
@@ -140,7 +142,7 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect(status,'/urls/');
 })
 
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL', (req, res) => {
   let shortURL = req.params.shortURL
   let status = 302;
   if (urlDatabase[shortURL].userID === req.userId) {
