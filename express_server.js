@@ -77,7 +77,6 @@ app.get('/urls', (req, res) => {
 
 // ADD A NEW URL ENTRY
 app.get('/urls/new', (req, res) => {
-
   if (!req.userId) {                         //if not logged in, redirect to log-in page.
     res.redirect('/login');
     return;
@@ -118,7 +117,6 @@ app.get('/urls/:shortURL', (req, res) => {
     return;
   }
   const ownerId = urlDatabase[shortURL].userID;
-
   if (req.userId !== ownerId) {
     res.send(`Error 401: Not Authorised. If you are the owner, please <a href='/login'>log in</a> to view this page.`);
     return;
@@ -235,9 +233,6 @@ app.post('/logout', (req,res) => {
 })
 
 
-
-
-//*****************************************************************
 app.listen(PORT, () => {
   console.log(`Test app listening on port ${PORT}`);
 });
