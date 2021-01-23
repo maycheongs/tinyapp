@@ -16,8 +16,8 @@
         <p class="card-text">Total Visits: <%= totalViews %></p>
         <p class="card-text">Unique Visitors: <%= uniqueViews %></p>
       </div>
-        <div class="card-footer text-muted"></div>
-        <div class="card-header"></div>
+        
+      <div class="card-footer text-muted"></div>
         <div class="card-body">          
         <h4 class="card-title">Edit</h4> 
         <p><form method="POST", action="/urls/<%=shortURL%>?_method=PUT">
@@ -28,6 +28,37 @@
         </div>
     <div class="card-footer text-muted"></div>
   </div>
+  <div class="container pt-3">
+    <h2></h2>               
+    <p class="text-center">Visitor timestamps:     &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</p>
+    <table class="table table-condensed table-sm mt-3 mx-auto" style="width: auto">
+      <thead>
+        <tr>
+          <th style="width:30%">Date/time:</th>
+          <th style="width:30%">Visitor ID:</th>
+  
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>'1970-01-01 00:00:01' UTC</td>
+          <td>ID: dsfsdf</td>
+     
+        </tr>
+        <tr>
+          <td>'1970-01-01 00:00:01' UTC</td>
+          <td>ID: dsfsdf</td>
+       
+        </tr>
+        <tr>
+          <td>'1970-01-01 00:00:01' UTC</td>
+          <td>ID: dsfsdf</td>
+        
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
   <%- include('partials/_footer') %>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
